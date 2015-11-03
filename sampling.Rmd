@@ -7,7 +7,7 @@ output: html_document
 
 Below are a quick summary of commands for statistics in R.
 
-### Basic commands about the library and getting dataset
+### Get the dataset and make samples
 ```{r}
 # Load the 'ames' data frame:
 load(url("http://assets.datacamp.com/course/dasi/ames.RData"))
@@ -24,9 +24,148 @@ price <- ames$SalePrice
 # Calculate the summary and draw a histogram of 'area'
 summary(area)
 hist(area, breaks=80)
+length(area)
+#head(area)
+area[1:20]
+```
+
+### Sampling from population
+```{r}
+# take a sample of size 50 from area
+samp0 <- sample(area, 50)
+hist(samp0, breaks=50)
+length(samp0)
+#head(samp0)
+samp0[1:20]
+```
+
+Not surprisingly, every time we take another random sample, we get a different sample mean. It's useful to get a sense of just how much variability we should expect when estimating the population mean this way.
+***The distribution of sample means, called the sampling distribution***, can help us understand this variability. In this lab, because we have access to the population, we can build up the sampling distribution for the sample mean by repeating the above steps many times. Here we will generate 5000 samples and compute the sample mean of each.
+
+Take 5000 samples of size 50 from the population, calculates the mean of each sample,
+
+### sampling distribution
+```{r}
+# Set up an empty vector of 5000 NAs to store sample means:
+sample_means10 <- rep(NA, 5000)
+sample_means50 <- rep(NA, 5000)
+sample_means100 <- rep(NA, 5000)
+
+# Take 5000 samples of size 50 of 'area' and store all of them in 'sample_means50'.
+for (i in 1:5000) {
+	 samp10 <- sample(area, 10)
+   samp50 <- sample(area, 50)
+   samp100 <- sample(area, 100)
+   
+   sample_means10[i] <- mean(samp10)
+   sample_means50[i] <- mean(samp50)
+   sample_means100[i] <- mean(samp100)
+}
+
+# View the result. If you want, you can increase the bin width to show more detail by changing the 'breaks' argument.
+#hist(sample_means50, breaks = 100)
+
+# Print the first few random means
+#head(sample_means50)
+
+sample_means10[1:10]
+sample_means50[1:10]
+sample_means100[1:10]
+
+#summary(sample_means10)
+#summary(sample_means50)
+#summary(sample_means100)
+mean(sample_means10); sd(sample_means10)
+mean(sample_means50); sd(sample_means50)
+mean(sample_means100); sd(sample_means100)
+```
+
+#### Plot three histograms
+```{r}
+# Divide the plot in 3 rows:
+par(mfrow = c(2, 2))
+
+# Define the limits for the x-axis:
+xlimits <- range(sample_means10)
+
+# Draw the histograms:
+hist(sample_means10, breaks=20, xlim=xlimits)
+hist(sample_means50, breaks=20, xlim=xlimits)
+hist(sample_means100, breaks=20, xlim=xlimits)
 
 ```
 
+### 95% Confidence Intervals
+based on this sample, what can we infer about the population? Based only on this single sample, the best estimate of the average living area of houses sold in Ames 
+would be the ***sample mean***.
+That serves as a good point estimate but it would be useful to also communicate how uncertain we are of that estimate. This can be captured by using a confidence interval.
+We can calculate a ***95% confidence interval*** for a sample mean by adding and subtracting ***1.96 standard errors*** to the point estimate.
+It is an important inference that we make with this: even though we don't know what the full population looks like, we're 95% confident that the true average size of houses in Ames lies between the values lower and upper.
+
+```{r}
+# Take a sample of size 60 of the population:
+population <- ames$Gr.Liv.Area
+samp <- sample(population, 60)
+
+# Calculate the mean:
+sample_mean <- mean(samp)
+
+# Draw a histogram:
+
+hist(samp)
+
+# Calculate the standard error:
+se <- sd(samp)/sqrt(60)
+
+# Calculate the lower and upper bounds of your confidence interval and print them:
+lower <- sample_mean - 1.96 * se
+upper <- sample_mean + 1.96 * se
+
+c(lower, upper)
+```
+
+How sample means and confidence intervals vary from one sample to another.
+
+Using R, we're going to recreate many samples using a for loop. Here is the rough outline:
+Obtain a random sample.
+Calculate the sample's mean and standard deviation.
+Use these statistics to calculate a confidence interval.
+
+```{r}
+# Initialize 'samp_mean', 'samp_sd' and 'n':
+samp_mean <- rep(NA, 50)
+samp_sd <- rep(NA, 50)
+n <- 60
+
+# For loop goes here:
+for (i in 1:50) {
+  samp <- sample(population, n) 
+  samp_mean[i] <- mean(samp)
+  samp_sd[i] <- sd(samp)
+}
+
+# Calculate the interval bounds here:
+lower <- samp_mean - 1.96 * (samp_sd/sqrt(n))
+upper <- samp_mean + 1.96 * (samp_sd/sqrt(n))
+
+# Plotting the confidence intervals:
+pop_mean <- mean(population)
+plot_ci(lower, upper, pop_mean)
+
+```
+
+### 99% Confidence Level
+
+```{r}
+# Calculate the interval bounds here:
+lower_99 <-  samp_mean - 2.58 * (samp_sd/sqrt(n))
+upper_99 <- samp_mean + 2.58 * (samp_sd/sqrt(n))
+
+# Plotting the confidence intervals:
+pop_mean <- mean(population)
+plot_ci(lower_99, upper_99, pop_mean)
+
+```
 
 
 
