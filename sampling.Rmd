@@ -1,0 +1,33 @@
+---
+title: "Sampling Distributions"
+author: "Himansu Sahoo"
+date: "November 03, 2015"
+output: html_document
+---
+
+Below are a quick summary of commands for statistics in R.
+
+### Basic commands about the library and getting dataset
+```{r}
+# Load the 'ames' data frame:
+load(url("http://assets.datacamp.com/course/dasi/ames.RData"))
+
+# Make some preliminary inspections:
+dim(ames)
+#names(ames)
+#head(ames)
+#tail(ames)
+
+area <- ames$Gr.Liv.Area
+price <- ames$SalePrice
+
+# Calculate the summary and draw a histogram of 'area'
+summary(area)
+hist(area, breaks=80)
+
+```
+
+
+
+
+
